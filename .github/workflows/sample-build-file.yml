@@ -5,7 +5,7 @@ on: [push]
 env:
   HOST: "localhost"
   MYSQLUSER: "root"
-  PASSWORD: "pass"
+  PASSWORD: "root@Cloud123"
 
 jobs:
   push-action:
@@ -37,5 +37,11 @@ jobs:
 
       - name: Dependency installation completed
         run: echo "Dependencies Installed"
+
+      - name: run tests
+        run: npm test
+
+      - name: Test files execution completion
+        run: echo "Finished running test files"
 
     
