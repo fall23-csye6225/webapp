@@ -16,13 +16,6 @@ dbConfig.PASSWORD, {
 	}
 });
 
-sequelize.authenticate()
-.then(() => {
-    console.log('connected...');
-})
-.catch(err => {
-    console.log('Error' + err);
-});
 
 const db = {}
 
@@ -32,15 +25,44 @@ db.sequelize = sequelize;
 db.users = require('./usersModel.js')(sequelize, DataTypes);
 db.assignments = require('./assignmentsModel.js')(sequelize, DataTypes);
 
+// db.users.hasMany(db.assignments, {
+// 	foreignKey: 'id',
+// 	as: 'assignment'
+// });
 
-db.sequelize.sync({force: false})
-.then(async () => {
-    console.log('Database schema synchronized');
-	await run(db.users);
+db.assignments.belongsTo(db.users, {
+	foriegnKey: 'id',
+	as: 'user'
+});
+
+
+sequelize.authenticate()
+.then(() => {
+    console.log('connected...');
+	return db.sequelize.sync({ force: false });
 })
-.catch((error) => {
-	console.error('Error synchronizing database:', error);
-}); 
+.then(async () => {
+  console.log('Database schema synchronized');
+  await run(db.users);
+})
+.catch(err => {
+    console.log('Error' + err);
+});
+
+
+// db.sequelize.sync({force: false})
+// .then(async () => {
+//     console.log('Database schema synchronized');
+// 	await run(db.users);
+// })
+// .catch((error) => {
+// 	console.error('Error synchronizing database:', error);
+// }); 
+
+
+
+
+
 
 
 module.exports = db;
