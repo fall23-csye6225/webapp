@@ -3,9 +3,9 @@ name: Workflow Test
 on: [push]
 
 env:
-  HOST: "localhost"
-  MYSQLUSER: "root"
-  PASSWORD: "root"
+  DB_HOST: "localhost"
+  DB_USER: "root"
+  DB_PASSWORD: "root"
 
 jobs:
   push-action:
@@ -34,9 +34,9 @@ jobs:
 
     - name: Show environment variables
       run: |
-        echo "HOST=${HOST}"
-        echo "MYSQLUSER=${MYSQLUSER}"
-        echo "PASSWORD=${PASSWORD}"
+        echo "DB_HOST=${HOST}"
+        echo "DB_USER=${MYSQLUSER}"
+        echo "DB_PASSWORD=${PASSWORD}"
         
     - name: configuremysql
       run: |
