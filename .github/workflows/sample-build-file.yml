@@ -1,0 +1,41 @@
+name: Workflow Test
+
+on: [push]
+
+env:
+  HOST: "localhost"
+  MYSQLUSER: "root"
+  PASSWORD: "pass"
+
+jobs:
+  push-action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Hello Message
+        run: echo "Hello, GitHub Actions!"
+
+      - name: Statring Node JS message
+        run: echo "Setting up Node JS"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Finishing Node JS set up message
+        run: echo "Node JS installation done"
+
+      - name: Starting dependency installation
+        run: echo "Installing Dependencies"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Dependency installation completed
+        run: echo "Dependencies Installed"
+
+    
