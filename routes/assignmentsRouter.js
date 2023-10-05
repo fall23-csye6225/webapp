@@ -10,5 +10,6 @@ router.post('/', assignmentsController.addAssignment)
 
 router.put('/:id', assignmentsController.updateAssignment)
 router.delete('/:id', assignmentsController.deleteAssignment)
+router.patch('/:id', assignmentsController.patchUpdateAssignment)
 
 module.exports = router;

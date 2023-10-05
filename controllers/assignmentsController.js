@@ -6,25 +6,45 @@ const Assignments = db.assignments;
 const addAssignment = async (req, res) => {
 
     try {
+        //let id = req.params.id;
         const userId = req.user.id;
         const user = await Users.findByPk(userId);
-        console.log("user", user);
-        console.log("userID", userId);
 
+        if(Object.entries(req.body).length === 0 || Object.keys(req.body).length === 0 || JSON.stringify(req.body) === '{}'){
+            return res.status(400).send({message: 'Bad Request'});
+        }
+        
+
+        const { name, points, num_of_attempts, deadline } = req.body;
+
+        //console.log(points);
+
+        if (deadline && new Date(deadline) <= new Date()) {
+            return res.status(400).send({message: 'Deadline must be in the future'});
+        }
+        if (points !== undefined && points < 1 || points > 10) {
+            return res.status(400).send({message: 'Points should be in the range 1 to 10'});
+        } 
+        if (num_of_attempts !== undefined && num_of_attempts < 1 || num_of_attempts > 100) {
+            return res.status(400).send({message: 'num_of_attempts should be in the range 1 to 100'});
+        }
+        
         if (!user) {
             return res.status(404).send('User not found');
-        }
+                }
+        
+                let info = {
+                    name: req.body.name,
+                    points: req.body.points,
+                    num_of_attempts: req.body.num_of_attempts,
+                    deadline: req.body.deadline,
+                    userId: userId
+                };
+        
+                const assignment = await Assignments.create(info);
+                res.status(200).send(assignment);
 
-        let info = {
-            name: req.body.name,
-            points: req.body.points,
-            num_of_attempts: req.body.num_of_attempts,
-            deadline: req.body.deadline,
-            userId: userId
-        };
-
-        const assignment = await Assignments.create(info);
-        res.status(200).send(assignment);
+        
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -56,7 +76,7 @@ const getAnAssignment = async (req, res) => {
         let assignment = await Assignments.findOne({ where: { id: id} });
         
         if (!assignment) {
-            return res.status(404).send('Assignment not found');
+            return res.status(204).send({message: 'Assignment not found'});
         }
 
         res.status(200).send(assignment);
@@ -76,7 +96,7 @@ const updateAssignment = async (req, res) => {
         // console.log("json",JSON.stringify(req.body) === '{}');
 
         if(Object.entries(req.body).length === 0 || Object.keys(req.body).length === 0 || JSON.stringify(req.body) === '{}'){
-            return res.status(204).send({message: 'No Content'});
+            return res.status(400).send({message: 'Bad Request'});
         }
         
         const userId = req.user.id;
@@ -95,6 +115,9 @@ const updateAssignment = async (req, res) => {
         if (points !== undefined && points < 1 || points > 10) {
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
+        if (num_of_attempts !== undefined && num_of_attempts < 1 || num_of_attempts > 100) {
+            return res.status(400).send({message: 'num_of_attempts should be in the range 1 to 100'});
+        }
         
         const updatedFields = {};
         if (name !== undefined) updatedFields.name = name;
@@ -115,7 +138,7 @@ const updateAssignment = async (req, res) => {
 
 
         } else {
-            return res.status(401).send({'message': 'Unauthorized User'});
+            return res.status(403).send({'message': 'Unauthorized User'});
         }
         
         
@@ -137,14 +160,20 @@ const deleteAssignment = async (req, res) => {
         if(!assignment){return res.status(404).send({message: 'Assignment not found'});}
         if(assignment.userId === userId){
             await Assignments.destroy({ where: { id: id, userId: userId } });
-            res.status(200).send({message: 'Assignment is deleted'});
+            res.status(204).send({message: 'Assignment is deleted'});
         } else {
-            return res.status(401).send({'message': 'Unauthorized User'});
+            return res.status(403).send({'message': 'Unauthorized User'});
         }
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
+}
+
+const patchUpdateAssignment = async (req, res) => {
+
+    return res.status(405).send({'message': 'Method Not Allowed'});
+
 }
 
 
@@ -153,6 +182,7 @@ module.exports = {
     getAllAssignments,
     getAnAssignment,
     updateAssignment,
-    deleteAssignment
+    deleteAssignment,
+    patchUpdateAssignment
 }
 
