@@ -1,0 +1,36 @@
+name: Check Packer Formatting and Validation
+
+on: [push]
+
+jobs:
+  packer-format-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: hashicorp/setup-packer@main
+        with:
+          version: 1.9.4
+
+      - run: packer init packer/ami.us-east-1.pkr.hcl
+
+      - name: Check Packer Formatting
+        run: |
+          echo "Checking Packer file formatting..."
+          if packer fmt -check .; then
+            echo "Packer file is properly formatted."
+          else
+            echo "Packer file is not properly formatted. Please run 'packer fmt' to format it."
+            exit 1
+          fi
+
+      - name: Validate Packer Configuration
+        run: |
+          echo "Validating Packer configuration..."
+          if packer validate .; then
+            echo "Packer configuration is valid."
+          else
+            echo "Packer configuration validation failed."
+            exit 1
+          fi
