@@ -18,7 +18,7 @@ jobs:
       - name: Check Packer Formatting
         run: |
           echo "Checking Packer file formatting..."
-          if packer fmt -check .; then
+          if packer fmt -check packer/ami.us-east-1.pkr.hcl; then
             echo "Packer file is properly formatted."
           else
             echo "Packer file is not properly formatted. Please run 'packer fmt' to format it."
@@ -28,7 +28,7 @@ jobs:
       - name: Validate Packer Configuration
         run: |
           echo "Validating Packer configuration..."
-          if packer validate .; then
+          if packer validate packer/ami.us-east-1.pkr.hcl; then
             echo "Packer configuration is valid."
           else
             echo "Packer configuration validation failed."
