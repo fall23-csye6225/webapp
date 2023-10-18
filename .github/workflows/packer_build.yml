@@ -1,0 +1,43 @@
+name: Build and Deploy
+
+on:
+  push:
+
+jobs:
+  BuildPacker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Zip the artifact
+      run: |
+        zip -r webapp.zip ./
+        ls -lrth
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: app-artifact
+        path: webapp.zip
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }} 
+
+    - name: Setup `packer`
+      uses: hashicorp/setup-packer@main
+      id: setup
+      with:
+        version: 'latest'
+
+    - name: Packer Init
+      run: packer init packer/ami.us-east-1.pkr.hcl
+  
+
+    - name: Build AMI with Packer
+      run: |
+        packer build packer/ami.us-east-1.pkr.hcl
