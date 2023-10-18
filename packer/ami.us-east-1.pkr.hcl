@@ -69,7 +69,7 @@ build {
       "DB_HOST=127.0.0.1",
     ]
 
-    script = "./scripts/setup.sh"
+    script = "./setup.sh"
 
   }
 
