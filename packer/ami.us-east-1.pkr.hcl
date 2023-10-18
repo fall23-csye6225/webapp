@@ -27,6 +27,11 @@ variable "subnet_id" {
   default = "subnet-08bbe8110935053cc"
 }
 
+variable "ssh_private_key_path" {
+  type    = string
+  default = "/path/to/your/private-key.pem"
+}
+
 source "amazon-ebs" "my-ami" {
   region   = "${var.aws_region}"
   ami_name = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
@@ -38,6 +43,9 @@ source "amazon-ebs" "my-ami" {
   ssh_username    = "${var.ssh_username}"
   subnet_id       = "${var.subnet_id}"
   ami_users       = ["528663852260", ]
+  tags = {
+    "Name" = ami_name,
+  }
 
   aws_polling {
     delay_seconds = 120
@@ -67,11 +75,25 @@ build {
       "DB_USER=root",
       "DB_NAME=assignmentsdb",
       "DB_HOST=127.0.0.1",
+      "DB_PASSWORD=root",
     ]
-
     script = "./setup.sh"
-
   }
 
-}
+  provisioner "file" {
+    source      = "./web_app_ami.zip"
+    destination = "/home/admin/web_app_ami.zip"
+  }
+
+  // provisioner "shell" {
+  // inline = [
+  //   "sudo mkdir -p /dist/",
+  //   "cp ../web_app_ami.zip /dist/web_app_ami.zip",
+  // ]
+  // }
+
+  provisioner "shell" {
+    script = "./app_setup.sh"
+  }
+} 
 
