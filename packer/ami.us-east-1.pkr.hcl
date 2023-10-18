@@ -28,20 +28,22 @@ variable "subnet_id" {
 }
 
 source "amazon-ebs" "my-ami" {
-  region = "${var.aws_region}"
-  // ami_name        = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
-  ami_name        = "cyse6225"
+  region   = "${var.aws_region}"
+  ami_name = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
+  //ami_name        = "cyse6225"
   ami_description = "AMI for CSYE6225"
   ami_regions     = ["us-east-1", ]
   instance_type   = "t2.micro"
   source_ami      = "${var.source_ami}"
   ssh_username    = "${var.ssh_username}"
   subnet_id       = "${var.subnet_id}"
+  ami_users       = ["528663852260", ]
 
   aws_polling {
     delay_seconds = 120
     max_attempts  = 50
   }
+
 
 
   launch_block_device_mappings {
@@ -61,18 +63,14 @@ build {
   provisioner "shell" {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
-      "CHECKPOINT_DISABLE=1"
+      "CHECKPOINT_DISABLE=1",
+      "DB_USER=root",
+      "DB_NAME=assignmentsdb",
+      "DB_HOST=127.0.0.1",
     ]
 
-    inline = [
-      "sudo apt-get update",
-      "sudo apt-get upgrade -y",
-      "sudo apt-get install -y libterm-readline-perl-perl",
-      "sudo apt-get install -y mariadb-server",
-      "sudo apt-get install -y nodejs",
-      "sudo apt-get install -y npm",
-      "sudo apt-get clean",
-    ]
+    script = "./scripts/setup.sh"
+
   }
 
 }
