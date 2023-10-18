@@ -12,7 +12,7 @@ jobs:
 
     - name: Zip the artifact
       run: |
-        zip -r webapp.zip ./
+        zip -r web_app_ami.zip ./
         ls -lrth
 
     - name: Upload artifact
