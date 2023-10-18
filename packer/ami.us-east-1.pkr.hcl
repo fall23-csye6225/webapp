@@ -34,7 +34,7 @@ variable "ssh_private_key_path" {
 
 source "amazon-ebs" "my-ami" {
   region   = "${var.aws_region}"
-  ami_name = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
+  ami_name = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm", timestamp())}"
   //ami_name        = "cyse6225"
   ami_description = "AMI for CSYE6225"
   ami_regions     = ["us-east-1", ]
@@ -44,7 +44,7 @@ source "amazon-ebs" "my-ami" {
   subnet_id       = "${var.subnet_id}"
   ami_users       = ["528663852260", ]
   tags = {
-    "Name" = ami_name,
+    "Name" = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm", timestamp())}",
   }
 
   aws_polling {
