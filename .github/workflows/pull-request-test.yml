@@ -11,7 +11,7 @@ on:
 env:
   DB_HOST: "localhost"
   DB_USER: "root"
-  DB_PASSWORD: "root"
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
   push-action:
