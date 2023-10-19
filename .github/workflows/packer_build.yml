@@ -1,7 +1,12 @@
 name: Build and Deploy
 
 on:
-  push:
+  [push]
+
+env:
+  DB_HOST: "localhost"
+  DB_USER: "root"
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}  
 
 jobs:
   BuildPacker:
@@ -9,6 +14,54 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Hello Message
+      run: echo "Hello, GitHub Actions!"
+
+    - name: Starting Node JS message
+      run: echo "Setting up Node JS"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14
+
+    - name: Finishing Node JS set up message
+      run: echo "Node JS installation done"
+
+    - name: Starting installation for mysql-server
+      run: echo "mysql-server installation done"
+
+    - name: Show environment variables
+      run: |
+        echo "DB_HOST=${HOST}"
+        echo "DB_USER=${MYSQLUSER}"
+        echo "DB_PASSWORD=${PASSWORD}"
+        
+    - name: configuremysql
+      run: |
+        sudo apt-get update
+        sudo systemctl start mysql
+        sudo systemctl status mysql
+        mysql -u root -p"${DB_PASSWORD}" -e "CREATE DATABASE assignmentsdb;"
+
+    - name: Starting dependency installation
+      run: echo "Installing Dependencies"
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Dependency installation completed
+      run: echo "Dependencies Installed"
+
+    - name: Running test files
+      run: echo "Starting test"
+
+    - name: run tests
+      run: npm test
+
+    - name: Test files execution completion
+      run: echo "Finished running test files"  
 
     - name: Zip the artifact
       run: |
@@ -40,4 +93,4 @@ jobs:
 
     - name: Build AMI with Packer
       run: |
-        packer build packer/ami.us-east-1.pkr.hcl
+        packer build -var-file=packer/packer_config.hcl packer/ami.us-east-1.pkr.hcl
