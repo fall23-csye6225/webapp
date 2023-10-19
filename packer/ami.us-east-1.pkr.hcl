@@ -91,5 +91,5 @@ build {
   provisioner "shell" {
     script = "./app_setup.sh"
   }
-} 
+}
 
