@@ -72,10 +72,6 @@ build {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1",
-      "DB_USER=root",
-      "DB_NAME=assignmentsdb",
-      "DB_HOST=127.0.0.1",
-      "DB_PASSWORD=root",
     ]
     script = "./setup.sh"
   }
