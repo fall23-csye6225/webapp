@@ -1,7 +1,10 @@
 name: Check Packer Formatting and Validation
 
 on:
-  pull_request:
+ pull_request:
+   branches:
+    - main
+ push:
     branches:
       - main
 
@@ -27,6 +30,17 @@ jobs:
             echo "Packer file is not properly formatted. Please run 'packer fmt' to format it."
             exit 1
           fi
+
+      - name: Zip the artifact
+        run: |
+          zip -r web_app_ami.zip ./
+          ls -lrth
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-artifact
+          path: webapp.zip    
 
       - name: Validate Packer Configuration
         run: |
