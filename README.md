@@ -4,10 +4,9 @@
 
 Command to copy the zip file to server
 
-scp -i .ssh/privatekey $zipfile.zip root@$IPAddress/opt
+scp -i .ssh/privatekeyfile $zipfile.zip root@$IPAddress/opt
 
-
-ssh -i .ssh/privatekey root@$IPAddress
+ssh -i .ssh/privatekeyfile root@$IPAddress
 
 Installing Dependencies
 ```bash
