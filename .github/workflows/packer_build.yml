@@ -1,7 +1,9 @@
 name: Build and Deploy
 
 on:
-  [push]
+ push:
+    branches:
+      - main
 
 env:
   DB_HOST: "localhost"
