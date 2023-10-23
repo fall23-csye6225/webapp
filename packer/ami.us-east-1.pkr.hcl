@@ -37,7 +37,7 @@ source "amazon-ebs" "my-ami" {
   ami_name = "csye6225_f23_${formatdate("YYYY_MM_DD_hh_mm", timestamp())}"
   //ami_name        = "cyse6225"
   ami_description = "AMI for CSYE6225"
-  ami_regions     = ["us-east-1", 
+  ami_regions     = ["us-east-1", ]
   instance_type   = "t2.micro"
   source_ami      = "${var.source_ami}"
   ssh_username    = "${var.ssh_username}"
