@@ -91,5 +91,10 @@ build {
   provisioner "shell" {
     script = "./app_setup.sh"
   }
+
+  provisioner "shell" {
+    script          = "./create-service.sh"
+    execute_command = "chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
+  }
 }
 
