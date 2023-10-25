@@ -3,6 +3,17 @@
 # Log file path
 LOG_FILE="/var/log/start-app.log"
 
+USER="systemd-user"
+GROUP="csye6225"
+
+
+sudo chown -R $USER:$GROUP /etc/environment
+sudo chmod 644 /etc/environment
+
+# Source the environment variables from /etc/environment
+source /etc/environment
+
+
 # Change to the directory where your Node.js application is located
 cd /opt/webapps || { echo "Error: Unable to change directory to /opt/webapps" | tee -a "$LOG_FILE"; exit 1; }
 

@@ -36,16 +36,18 @@ SyslogIdentifier=csye6225
 
 [Install]
 WantedBy=multi-user.target
+WantedBy=cloud-init.target
 EOF
-
 
 # Set permissions on the service unit file
 sudo chmod 664 "/etc/systemd/system/$APP_NAME.service"
-sudo chown systemd-user:csye6225 /var/log/$APP_NAME.service/
+sudo chown $USER:$GROUP /var/log/$APP_NAME.service/
 sudo chmod 755 /var/log/$APP_NAME.service/
 sudo chmod +x $APP_DIRECTORY/start-app.sh
 
+sudo chown -R $USER:$GROUP /opt/webapps
+sudo chmod -R 755 /opt/webapps
+# sudo chown -R $USER:$GROUP /etc/environment
+# sudo chmod 644 /etc/environment
 
-
-#systemctl enable $APP_NAME
-#systemctl start $APP_NAME
+sudo systemctl daemon-reload
