@@ -13,8 +13,7 @@ sudo groupadd ${GROUP}
 sudo useradd --system --shell /bin/false --no-create-home -g $GROUP $USER
 
 sudo mkdir -p /var/log/$APP_NAME.service
-sudo mkdir -p /var/log/$APP_NAME.service/out.log
-sudo mkdir -p /var/log/$APP_NAME.service/error.log
+sudo touch /var/log/$APP_NAME.service/out.log /var/log/$APP_NAME.service/error.log
 
 cat <<EOF | sudo tee /etc/systemd/system/$APP_NAME.service
 [Unit]
@@ -44,6 +43,7 @@ EOF
 sudo chmod 664 "/etc/systemd/system/$APP_NAME.service"
 sudo chown systemd-user:csye6225 /var/log/$APP_NAME.service/
 sudo chmod 755 /var/log/$APP_NAME.service/
+sudo chmod +x $APP_DIRECTORY/start-app.sh
 
 
 
