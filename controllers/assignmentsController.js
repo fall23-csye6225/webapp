@@ -133,7 +133,7 @@ const updateAssignment = async (req, res) => {
             return res.status(404).send({message: 'Assignment not found'});
         }
 
-        res.status(200).send({message: 'Assignment updated successfully'});
+        res.status(204).send({message: 'Assignment updated successfully'});
 
 
 
