@@ -19,7 +19,7 @@ cat <<EOF | sudo tee /etc/systemd/system/$APP_NAME.service
 [Unit]
 Description=$APP_NAME
 ConditionPathExists=/opt/webapps/
-After=cloud-init.service
+After=cloud-final.service
 
 [Service]
 Type=simple
