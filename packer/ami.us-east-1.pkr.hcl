@@ -96,5 +96,17 @@ build {
     script          = "./create-service.sh"
     execute_command = "chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
   }
+
+  provisioner "file" {
+    source      = "./cloudwatch-config.json"
+    destination = "/tmp/cloudwatch-config.json"
+  }
+
+  provisioner "shell" {
+    script = "./install_cloudwatchagent.sh"
+  }
+
+  
+
 }
 
