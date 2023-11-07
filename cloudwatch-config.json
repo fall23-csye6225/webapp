@@ -8,10 +8,15 @@
         "files": {
           "collect_list": [
             {
-              "file_path": "/var/log/start-app.log",
+              "file_path": "/var/log/Assignment-node-app.service/out.log",
               "log_group_name": "csye6225cloudapp",
-              "log_stream_name": "webapp"
-            }
+              "log_stream_name": "webappoutput"
+            },
+            {
+                "file_path": "/var/log/Assignment-node-app.service/error.log",
+                "log_group_name": "csye6225cloudapp",
+                "log_stream_name": "webapperror"
+              }
           ]
         }
       },
@@ -22,7 +27,8 @@
         "statsd": {
           "service_address": ":8125",
           "metrics_collection_interval": 15,
-          "metrics_aggregation_interval": 300
+          "metrics_aggregation_interval": 300,
+          "metrics_aggregation_group_list": "api_calls"
         }
       }
     }

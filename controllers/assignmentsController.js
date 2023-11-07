@@ -2,10 +2,13 @@ const db = require('../models/index');
 
 const Users = db.users;
 const Assignments = db.assignments;
+const StatsD = require('node-statsd');
+const statsdClient = new StatsD();
 
 const addAssignment = async (req, res) => {
 
     try {
+        statsdClient.increment('api_calls');
         //let id = req.params.id;
         const userId = req.user.id;
         const user = await Users.findByPk(userId);
@@ -43,7 +46,7 @@ const addAssignment = async (req, res) => {
         
                 const assignment = await Assignments.create(info);
                 res.status(200).send(assignment);
-
+                
         
     } catch (error) {
         console.error(error);
@@ -57,7 +60,7 @@ const getAllAssignments = async (req, res) => {
 
     try {
         //const userId = req.user.id;
-
+        statsdClient.increment('api_calls');
         let assignments = await Assignments.findAll({});
         res.status(200).send(assignments);
     } catch (error) {
@@ -70,6 +73,7 @@ const getAllAssignments = async (req, res) => {
 const getAnAssignment = async (req, res) => {
 
     try {
+        statsdClient.increment('api_calls');
         let id = req.params.id;
         //const userId = req.user.id;
 
@@ -90,6 +94,7 @@ const getAnAssignment = async (req, res) => {
 
 const updateAssignment = async (req, res) => {
     try {
+        statsdClient.increment('api_calls');
         let id = req.params.id;
         // console.log("entires",Object.entries(req.body).length);
         // console.log("keys",Object.keys(req.body).length === 0);
@@ -153,6 +158,7 @@ const updateAssignment = async (req, res) => {
 const deleteAssignment = async (req, res) => {
 
     try {
+        statsdClient.increment('api_calls');
     let id = req.params.id;
         
         const userId = req.user.id;
@@ -171,6 +177,7 @@ const deleteAssignment = async (req, res) => {
 }
 
 const patchUpdateAssignment = async (req, res) => {
+    statsdClient.increment('api_calls');
 
     return res.status(405).send({'message': 'Method Not Allowed'});
 
