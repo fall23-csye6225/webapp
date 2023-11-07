@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const checkAuthorization = require('./middleware/checkAuth');
 const db = require('./models/index');
+const StatsD = require('node-statsd');
+const statsdClient = new StatsD();
 
 
 const app = express();
@@ -45,6 +47,7 @@ app.use((req, res, next) => {
 
 
 app.get("/healthz", (req, res) => {
+  statsdClient.increment('api_calls');
     console.log("test:",req.body.length);
     db.sequelize.authenticate().then( ()=> {
         res.setHeader('Cache-Control', 'no-cache');
@@ -62,27 +65,32 @@ app.get("/healthz", (req, res) => {
 
 
   app.post("/healthz", (req, res) => {
+    statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.put("/healthz", (req, res) => {
+    statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.delete("/healthz", (req, res) => {
+    statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.patch("/healthz", (req, res) => {
+    statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
 
   app.options("/healthz", (req, res) => {
+    statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
@@ -90,6 +98,7 @@ app.get("/healthz", (req, res) => {
 
 
 app.use((req, res, next) => {
+  statsdClient.increment('api_calls');
     res.setHeader('Cache-Control', 'no-cache');
     res.status(404).send();
   });
