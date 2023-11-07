@@ -103,7 +103,7 @@ build {
   }
 
   provisioner "shell" {
-    script = "./install_cloudwatchagent.sh"
+    script = "./install-cloudwatchagent.sh"
   }
 
   
