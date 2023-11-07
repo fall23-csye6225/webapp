@@ -99,7 +99,7 @@ build {
 
   provisioner "file" {
     source      = "./cloudwatch-config.json"
-    destination = "/opt/cloudwatch-config.json"
+    destination = "/home/admin/cloudwatch-config.json"
   }
 
   provisioner "shell" {
