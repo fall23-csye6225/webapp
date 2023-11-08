@@ -7,7 +7,7 @@ const statsdClient = new StatsD(({
   host: 'localhost',  
   port: 8125,          
 }));
-const log4js = require('../log4js_config');
+const log4js = require('./log4js_config');
 
 const logger = log4js.getLogger();
 
