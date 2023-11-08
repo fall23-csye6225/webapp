@@ -3,17 +3,26 @@ const db = require('../models/index');
 const Users = db.users;
 const Assignments = db.assignments;
 const StatsD = require('node-statsd');
-const statsdClient = new StatsD();
+const statsdClient = new StatsD(({
+    host: 'localhost',  
+    port: 8125,          
+  }));
+const log4js = require('../log4js_config');
+
+const logger = log4js.getLogger();
+
 
 const addAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls');
+        statsdClient.increment('api_calls_count');
+        logger.info(`Received ${req.method} request to add assignment`);
         //let id = req.params.id;
         const userId = req.user.id;
         const user = await Users.findByPk(userId);
 
         if(Object.entries(req.body).length === 0 || Object.keys(req.body).length === 0 || JSON.stringify(req.body) === '{}'){
+            logger.warn('Bad request: Request body is empty.');
             return res.status(400).send({message: 'Bad Request'});
         }
         
@@ -23,16 +32,20 @@ const addAssignment = async (req, res) => {
         //console.log(points);
 
         if (deadline && new Date(deadline) <= new Date()) {
+            logger.warn('Deadline must be in the future.');
             return res.status(400).send({message: 'Deadline must be in the future'});
         }
         if (points !== undefined && points < 1 || points > 10) {
+            logger.warn('Points should be in the range 1 to 10.');
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
         if (num_of_attempts !== undefined && num_of_attempts < 1 || num_of_attempts > 100) {
+            logger.warn('num_of_attempts should be in the range 1 to 100');
             return res.status(400).send({message: 'num_of_attempts should be in the range 1 to 100'});
         }
         
         if (!user) {
+            logger.warn('User not found.');
             return res.status(404).send('User not found');
                 }
         
@@ -45,11 +58,13 @@ const addAssignment = async (req, res) => {
                 };
         
                 const assignment = await Assignments.create(info);
+                logger.info(`Assignment created successfully: ${assignment.id}`);
                 res.status(200).send(assignment);
                 
         
     } catch (error) {
         console.error(error);
+        logger.error(`Error occurred while processing the ${req.method} request: ${error}`);
         res.status(500).send('Internal Server Error');
     }
 
@@ -60,11 +75,13 @@ const getAllAssignments = async (req, res) => {
 
     try {
         //const userId = req.user.id;
-        statsdClient.increment('api_calls');
+        statsdClient.increment('api_calls_count');
+        logger.info(`Received ${req.method} request to get all assignments`);
         let assignments = await Assignments.findAll({});
         res.status(200).send(assignments);
     } catch (error) {
         console.error(error);
+        logger.error(`Error occurred while processing the ${req.method} request: ${error}`);
         res.status(500).send('Internal Server Error');
     }
 }
@@ -73,19 +90,22 @@ const getAllAssignments = async (req, res) => {
 const getAnAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls');
+        statsdClient.increment('api_calls_count');
+        logger.info(`Received ${req.method} request to get assignment with id: ${req.params.id}`);
         let id = req.params.id;
         //const userId = req.user.id;
 
         let assignment = await Assignments.findOne({ where: { id: id} });
         
         if (!assignment) {
+            logger.info(`No assignment found with id: ${id}`);
             return res.status(204).send({message: 'Assignment not found'});
         }
-
+        logger.info(`Retrieved assignment details for id: ${id}`);
         res.status(200).send(assignment);
     } catch (error) {
         console.error(error);
+        logger.error(`Error occurred while processing the ${req.method} request: ${error}`);
         res.status(500).send('Internal Server Error');
     }
 
@@ -94,20 +114,25 @@ const getAnAssignment = async (req, res) => {
 
 const updateAssignment = async (req, res) => {
     try {
-        statsdClient.increment('api_calls');
+        statsdClient.increment('api_calls_count');
+        logger.info(`Received ${req.method} request to update assignment with id: ${req.params.id}`);
         let id = req.params.id;
         // console.log("entires",Object.entries(req.body).length);
         // console.log("keys",Object.keys(req.body).length === 0);
         // console.log("json",JSON.stringify(req.body) === '{}');
 
         if(Object.entries(req.body).length === 0 || Object.keys(req.body).length === 0 || JSON.stringify(req.body) === '{}'){
+            logger.warn('Bad request: Request body is empty.');
             return res.status(400).send({message: 'Bad Request'});
         }
         
         const userId = req.user.id;
         let assignment = await Assignments.findOne({ where: { id: id} });
         // console.log("assi", assignment);
-        if(!assignment){return res.status(404).send({message: 'Assignment not found'});}
+        if(!assignment){
+            logger.info(`No assignment found with id: ${id}`);
+            return res.status(404).send({message: 'Assignment not found'});
+        }
         if(assignment.userId === userId){
 
         const { name, points, num_of_attempts, deadline } = req.body;
@@ -135,20 +160,24 @@ const updateAssignment = async (req, res) => {
         let result = await Assignments.update(updatedFields, { where: { id: id, userId: userId } });
 
         if (result[0] === 0) {
+            logger.info(`Assignment not found or not updated for id: ${id}`);
             return res.status(404).send({message: 'Assignment not found'});
         }
 
+        logger.info(`Assignment updated successfully: ${id}`);
         res.status(204).send({message: 'Assignment updated successfully'});
 
 
 
         } else {
+            logger.warn('Unauthorized user attempt to update assignment.');
             return res.status(403).send({'message': 'Unauthorized User'});
         }
         
         
     } catch (error) {
         console.error(error);
+        logger.error(`Error occurred while processing the ${req.method} request: ${error}`);
         res.status(500).send('Internal Server Error');
     }
 };
@@ -158,26 +187,35 @@ const updateAssignment = async (req, res) => {
 const deleteAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls');
+        statsdClient.increment('api_calls_count');
+        logger.info(`Received ${req.method} request to delete assignment with id: ${req.params.id}`);
     let id = req.params.id;
         
         const userId = req.user.id;
         let assignment = await Assignments.findOne({ where: { id: id} });
-        if(!assignment){return res.status(404).send({message: 'Assignment not found'});}
+        if(!assignment){
+            logger.info(`No assignment found with id: ${id}`);
+            return res.status(404).send({message: 'Assignment not found'});
+        }
         if(assignment.userId === userId){
             await Assignments.destroy({ where: { id: id, userId: userId } });
+            logger.info(`Assignment deleted successfully: ${id}`);
             res.status(204).send({message: 'Assignment is deleted'});
         } else {
+            logger.warn('Unauthorized user attempt to delete assignment.');
             return res.status(403).send({'message': 'Unauthorized User'});
         }
     } catch (error) {
         console.error(error);
+        logger.error(`Error occurred while processing the ${req.method} request: ${error}`);
         res.status(500).send('Internal Server Error');
     }
 }
 
 const patchUpdateAssignment = async (req, res) => {
-    statsdClient.increment('api_calls');
+    statsdClient.increment('api_calls_count');
+    logger.info(`Received ${req.method} request for patch update assignment with id: ${req.params.id}`);
+    logger.warn('Received a PATCH request, but this method does not support PATCH updates.');
 
     return res.status(405).send({'message': 'Method Not Allowed'});
 
