@@ -5,7 +5,7 @@ log4js.configure({
   appenders: {
     cloudwatch: {
       type: 'log4js-cloudwatch-appender',
-      logGroup: 'csye6225',  
+      logGroup: 'csye6225cloudapp',  
       logStream: 'log4js-log',  
       region: 'us-east-1',  
     },
