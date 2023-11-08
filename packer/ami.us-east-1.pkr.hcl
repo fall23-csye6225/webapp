@@ -106,7 +106,7 @@ build {
     script = "./install-cloudwatchagent.sh"
   }
 
-  
+
 
 }
 
