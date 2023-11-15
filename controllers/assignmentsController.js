@@ -40,7 +40,7 @@ const addAssignment = async (req, res) => {
             logger.warn('Deadline must be in the future.');
             return res.status(400).send({message: 'Deadline must be in the future'});
         }
-        if (points == undefined || points < 1 || points > 10) {
+        if (points == undefined || !Number.isInteger(points) || points < 1 || points > 10) {
             logger.warn('Points should be in the range 1 to 10.');
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
@@ -150,7 +150,7 @@ const updateAssignment = async (req, res) => {
         if (deadline == undefined || new Date(deadline) <= new Date()) {
             return res.status(400).send({message: 'Deadline must be in the future'});
         }
-        if (points == undefined || points < 1 || points > 10) {
+        if (points == undefined || !Number.isInteger(points) || points < 1 || points > 10) {
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
         if (num_of_attempts == undefined || num_of_attempts < 1 || num_of_attempts > 100) {
@@ -197,9 +197,15 @@ const deleteAssignment = async (req, res) => {
     try {
         statsdClient.increment('api_call_delete');
         logger.info(`Received ${req.method} request to delete assignment with id: ${req.params.id}`);
-    let id = req.params.id;
+        let id = req.params.id;
         
         const userId = req.user.id;
+
+        if (Object.keys(req.body).length > 0) {
+            logger.warn('Request with body is not allowed for deletion.');
+            return res.status(400).send({ message: 'Request with body is not allowed for deletion' });
+        }
+        
         let assignment = await Assignments.findOne({ where: { id: id} });
         if(!assignment){
             logger.info(`No assignment found with id: ${id}`);
