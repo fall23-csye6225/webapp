@@ -15,7 +15,7 @@ const logger = log4js.getLogger();
 const addAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls_count');
+        statsdClient.increment('api_call_post');
         logger.info(`Received ${req.method} request to add assignment`);
         //let id = req.params.id;
         const userId = req.user.id;
@@ -31,15 +31,20 @@ const addAssignment = async (req, res) => {
 
         //console.log(points);
 
-        if (deadline && new Date(deadline) <= new Date()) {
+
+        if(name == undefined) {
+            logger.warn('Name is not defined.');
+            return res.status(400).send({message: 'Name is not defined.'});
+        }
+        if (deadline == undefined || new Date(deadline) <= new Date()) {
             logger.warn('Deadline must be in the future.');
             return res.status(400).send({message: 'Deadline must be in the future'});
         }
-        if (points !== undefined && points < 1 || points > 10) {
+        if (points == undefined || points < 1 || points > 10) {
             logger.warn('Points should be in the range 1 to 10.');
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
-        if (num_of_attempts !== undefined && num_of_attempts < 1 || num_of_attempts > 100) {
+        if (num_of_attempts == undefined || num_of_attempts < 1 || num_of_attempts > 100) {
             logger.warn('num_of_attempts should be in the range 1 to 100');
             return res.status(400).send({message: 'num_of_attempts should be in the range 1 to 100'});
         }
@@ -59,7 +64,7 @@ const addAssignment = async (req, res) => {
         
                 const assignment = await Assignments.create(info);
                 logger.info(`Assignment created successfully: ${assignment.id}`);
-                res.status(200).send(assignment);
+                res.status(201).send(assignment);
                 
         
     } catch (error) {
@@ -75,7 +80,7 @@ const getAllAssignments = async (req, res) => {
 
     try {
         //const userId = req.user.id;
-        statsdClient.increment('api_calls_count');
+        statsdClient.increment('api_call_get');
         logger.info(`Received ${req.method} request to get all assignments`);
         let assignments = await Assignments.findAll({});
         res.status(200).send(assignments);
@@ -90,7 +95,7 @@ const getAllAssignments = async (req, res) => {
 const getAnAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls_count');
+        statsdClient.increment('api_call_get');
         logger.info(`Received ${req.method} request to get assignment with id: ${req.params.id}`);
         let id = req.params.id;
         //const userId = req.user.id;
@@ -99,7 +104,7 @@ const getAnAssignment = async (req, res) => {
         
         if (!assignment) {
             logger.info(`No assignment found with id: ${id}`);
-            return res.status(204).send({message: 'Assignment not found'});
+            return res.status(404).send({message: 'Assignment not found'});
         }
         logger.info(`Retrieved assignment details for id: ${id}`);
         res.status(200).send(assignment);
@@ -114,7 +119,7 @@ const getAnAssignment = async (req, res) => {
 
 const updateAssignment = async (req, res) => {
     try {
-        statsdClient.increment('api_calls_count');
+        statsdClient.increment('api_call_put');
         logger.info(`Received ${req.method} request to update assignment with id: ${req.params.id}`);
         let id = req.params.id;
         // console.log("entires",Object.entries(req.body).length);
@@ -138,14 +143,17 @@ const updateAssignment = async (req, res) => {
         const { name, points, num_of_attempts, deadline } = req.body;
 
         //console.log(points);
-
-        if (deadline && new Date(deadline) <= new Date()) {
+        if(name == undefined) {
+            logger.warn('Name is not defined.');
+            return res.status(400).send({message: 'Name is not defined.'});
+        }
+        if (deadline == undefined || new Date(deadline) <= new Date()) {
             return res.status(400).send({message: 'Deadline must be in the future'});
         }
-        if (points !== undefined && points < 1 || points > 10) {
+        if (points == undefined || points < 1 || points > 10) {
             return res.status(400).send({message: 'Points should be in the range 1 to 10'});
         } 
-        if (num_of_attempts !== undefined && num_of_attempts < 1 || num_of_attempts > 100) {
+        if (num_of_attempts == undefined || num_of_attempts < 1 || num_of_attempts > 100) {
             return res.status(400).send({message: 'num_of_attempts should be in the range 1 to 100'});
         }
         
@@ -187,7 +195,7 @@ const updateAssignment = async (req, res) => {
 const deleteAssignment = async (req, res) => {
 
     try {
-        statsdClient.increment('api_calls_count');
+        statsdClient.increment('api_call_delete');
         logger.info(`Received ${req.method} request to delete assignment with id: ${req.params.id}`);
     let id = req.params.id;
         
@@ -213,7 +221,7 @@ const deleteAssignment = async (req, res) => {
 }
 
 const patchUpdateAssignment = async (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_patch');
     logger.info(`Received ${req.method} request for patch update assignment with id: ${req.params.id}`);
     logger.warn('Received a PATCH request, but this method does not support PATCH updates.');
 

@@ -53,7 +53,7 @@ app.use((req, res, next) => {
 
 
 app.get("/healthz", (req, res) => {
-  statsdClient.increment('api_calls_count');
+  statsdClient.increment('api_call_get_healthz');
   logger.info(`Received ${req.method} request for health check`);
     console.log("test:",req.body.length);
     db.sequelize.authenticate().then( ()=> {
@@ -75,28 +75,28 @@ app.get("/healthz", (req, res) => {
 
 
   app.post("/healthz", (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_post_healthz');
     logger.warn(`Received a ${req.method} request for health check. This endpoint only supports GET requests.`);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.put("/healthz", (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_put_healthz');
     logger.warn(`Received a ${req.method} request for health check. This endpoint only supports GET requests.`);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.delete("/healthz", (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_delete_healthz');
     logger.warn(`Received a ${req.method} request for health check. This endpoint only supports GET requests.`);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
   });
 
   app.patch("/healthz", (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_patch_healthz');
     logger.warn(`Received a ${req.method} request for health check. This endpoint only supports GET requests.`);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();
@@ -104,7 +104,7 @@ app.get("/healthz", (req, res) => {
 
 
   app.options("/healthz", (req, res) => {
-    statsdClient.increment('api_calls_count');
+    statsdClient.increment('api_call_options_healthz');
     logger.warn(`Received a ${req.method} request for health check. This endpoint only supports GET requests.`);
     res.setHeader('Cache-Control', 'no-cache');
     res.status(405).send();

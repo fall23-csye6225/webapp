@@ -10,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     type: DataTypes.STRING
     },
     points: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER.UNSIGNED
     },
     num_of_attempts: {
-    type: DataTypes.INTEGER
+    type: DataTypes.INTEGER.UNSIGNED
     },
     deadline: {
     type: DataTypes.DATE,
