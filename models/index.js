@@ -24,6 +24,7 @@ db.sequelize = sequelize;
 
 db.users = require('./usersModel.js')(sequelize, DataTypes);
 db.assignments = require('./assignmentsModel.js')(sequelize, DataTypes);
+db.submissions = require('./submissionsModel.js')(sequelize, DataTypes);
 
 // db.users.hasMany(db.assignments, {
 // 	foreignKey: 'id',
@@ -34,6 +35,16 @@ db.assignments.belongsTo(db.users, {
 	foriegnKey: 'id',
 	as: 'user'
 });
+
+db.submissions.belongsTo(db.assignments, {
+	foriegnKey: 'id',
+	as: 'assignment_id'
+})
+
+db.submissions.belongsTo(db.users, {
+	foriegnKey: 'id',
+	as: 'user_id'
+})
 
 
 sequelize.authenticate()
