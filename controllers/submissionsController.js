@@ -1,4 +1,7 @@
 const db = require('../models/index');
+const AWS = require('aws-sdk');
+const sns = new AWS.SNS();
+
 
 const Users = db.users;
 const Assignments = db.assignments;
@@ -11,6 +14,7 @@ const statsdClient = new StatsD(({
 const log4js = require('../log4js_config');
 
 const logger = log4js.getLogger();
+const snsTopicArn = process.env.SNS_TOPIC_ARN;
 
 
 const addSubmission = async (req, res) => {
@@ -105,9 +109,31 @@ const addSubmission = async (req, res) => {
                         logger.info(`Submission not found or not updated`);
                         return res.status(404).send({message: 'Submission not found'});
                     }
+
+                    let submissionNew = await Submissions.findOne({ where: {
+                        assignmentId,
+                        userId,
+                    }, });
+
+                    const snsParams = {
+                        TopicArn: snsTopicArn,
+                        Message: JSON.stringify({
+                            submission_url: submission.submission_url,
+                            user_email: user.email,
+                        }),
+                    };
+            
+                    sns.publish(snsParams, (err, data) => {
+                        if (err) {
+                            console.error('Error publishing to SNS:', err);
+                        } else {
+                            console.log('Successfully published to SNS:', data);
+                        }
+                    });
+
             
                     logger.info(`Submission updated successfully`);
-                    res.status(204).send({message: 'Submission updated successfully'});        
+                    res.status(201).send(submissionNew );        
             
                     // const submission = await Submissions.create(submission_info);
                     // logger.info(`Submission created successfully: ${submission.id}`);
@@ -116,10 +142,31 @@ const addSubmission = async (req, res) => {
 
             let submissionInfo = {
                 submission_url: submission_url,
-                attempts: 0
+                attempts: 1,
+                userId: userId,
+                assignmentId: assignmentId
             };
     
             const submission = await Submissions.create(submissionInfo);
+
+            const snsParams = {
+                TopicArn: snsTopicArn,
+                Message: JSON.stringify({
+                    submission_url: submission_url,
+                    user_email: user.email
+                }),
+            };
+    
+            sns.publish(snsParams, (err, data) => {
+                if (err) {
+                    console.error('Error publishing to SNS:', err);
+                } else {
+                    console.log('Successfully published to SNS:', data);
+                }
+            });
+
+
+
             logger.info(`Assignment created successfully: ${submission.id}`);
             res.status(201).send(submission);
 

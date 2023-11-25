@@ -38,12 +38,12 @@ db.assignments.belongsTo(db.users, {
 
 db.submissions.belongsTo(db.assignments, {
 	foriegnKey: 'id',
-	as: 'assignment_id'
+	as: 'assignment'
 })
 
 db.submissions.belongsTo(db.users, {
 	foriegnKey: 'id',
-	as: 'user_id'
+	as: 'user'
 })
 
 
