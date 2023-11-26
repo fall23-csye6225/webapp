@@ -2,6 +2,7 @@ const db = require('../models/index');
 
 const Users = db.users;
 const Assignments = db.assignments;
+const Submissions = db.submissions;
 const StatsD = require('node-statsd');
 const statsdClient = new StatsD(({
     host: 'localhost',  
@@ -212,9 +213,22 @@ const deleteAssignment = async (req, res) => {
             return res.status(404).send({message: 'Assignment not found'});
         }
         if(assignment.userId === userId){
+            const submissionExists = await Submissions.count({
+                where: {
+                    id
+                },
+            });
+            if(submissionExists){
+            logger.info(`Assignment was not deleted`);
+            res.status(404).send({message: 'Assignment found with submissions.'});
+            } else {
+
             await Assignments.destroy({ where: { id: id, userId: userId } });
             logger.info(`Assignment deleted successfully: ${id}`);
             res.status(204).send({message: 'Assignment is deleted'});
+            }
+    
+            
         } else {
             logger.warn('Unauthorized user attempt to delete assignment.');
             return res.status(403).send({'message': 'Unauthorized User'});

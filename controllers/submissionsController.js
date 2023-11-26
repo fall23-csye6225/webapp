@@ -167,7 +167,7 @@ const addSubmission = async (req, res) => {
 
 
 
-            logger.info(`Assignment created successfully: ${submission.id}`);
+            logger.info(`Submission created successfully: ${submission.id}`);
             res.status(201).send(submission);
 
         }
