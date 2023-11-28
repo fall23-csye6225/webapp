@@ -122,6 +122,7 @@ const addSubmission = async (req, res) => {
                             user_email: user.email,
                             assignment_id: assignment.id,
                             submission_id: submission.id,
+                            user_id: user.id,
                         }),
                     };
             
