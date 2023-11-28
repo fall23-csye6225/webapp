@@ -120,6 +120,8 @@ const addSubmission = async (req, res) => {
                         Message: JSON.stringify({
                             submission_url: submission.submission_url,
                             user_email: user.email,
+                            assignment_id: assignment.id,
+                            submission_id: submission.id,
                         }),
                     };
             
@@ -152,8 +154,11 @@ const addSubmission = async (req, res) => {
             const snsParams = {
                 TopicArn: snsTopicArn,
                 Message: JSON.stringify({
-                    submission_url: submission_url,
-                    user_email: user.email
+                    submission_url: submission.submission_url,
+                    user_email: user.email,
+                    assignment_id: assignment.id,
+                    submission_id: submission.id,
+                    user_id: user.id,
                 }),
             };
     
