@@ -6,9 +6,6 @@ module.exports = (sequelize, DataTypes) => {
     allowNull: false,
     primaryKey: true,
     },
-    attempts: {
-    type: DataTypes.INTEGER.UNSIGNED,    
-    },
     submission_url: {
     type: DataTypes.STRING,
     allowNull: false,
