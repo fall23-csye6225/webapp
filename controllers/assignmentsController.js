@@ -215,7 +215,7 @@ const deleteAssignment = async (req, res) => {
         if(assignment.userId === userId){
             const submissionExists = await Submissions.count({
                 where: {
-                    id
+                    assignmentId:id
                 },
             });
             if(submissionExists){
