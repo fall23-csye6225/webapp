@@ -123,6 +123,9 @@ const addSubmission = async (req, res) => {
                             assignment_id: assignment.id,
                             submission_id: submission.id,
                             user_id: user.id,
+                            assignment_name: assignment.name,
+                            attempts: submission.attempts,
+                            deadline: assignment.deadline,
                         }),
                     };
             
@@ -160,6 +163,9 @@ const addSubmission = async (req, res) => {
                     assignment_id: assignment.id,
                     submission_id: submission.id,
                     user_id: user.id,
+                    assignment_name: assignment.name,
+                    attempts: submission.attempts,
+                    deadline: assignment.deadline,
                 }),
             };
     
