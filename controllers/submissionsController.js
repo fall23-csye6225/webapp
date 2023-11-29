@@ -46,7 +46,7 @@ const addSubmission = async (req, res) => {
         //console.log(points);
 
 
-        if(submission_url == undefined) {
+        if(submission_url === undefined || submission_url === null || submission_url === '') {
             logger.warn('Submission URL is not provided.');
             return res.status(400).send({message: 'Submission URL is not provided.'});
         }
@@ -82,8 +82,8 @@ const addSubmission = async (req, res) => {
 
         const submissionExists = await Submissions.count({
             where: {
-                assignmentId,
-                userId,
+                assignmentId:assignmentId,
+                userId:userId,
             },
         });
 
