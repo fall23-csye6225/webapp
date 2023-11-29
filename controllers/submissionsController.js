@@ -50,6 +50,20 @@ const addSubmission = async (req, res) => {
             logger.warn('Submission URL is not provided.');
             return res.status(400).send({message: 'Submission URL is not provided.'});
         }
+
+        function isValidUrl(url) {
+            try {
+              new URL(url);
+              return true;
+            } catch (error) {
+              return false;
+            }
+          }
+
+        if(!isValidUrl(submission_url)) {
+            logger.warn('Submission URL is not a valid URL.');
+            return res.status(400).send({message: 'Submission URL is not a valid URL.'});
+        }  
         
         if (!user) {
             logger.warn('User not found.');
@@ -73,73 +87,77 @@ const addSubmission = async (req, res) => {
             },
         });
 
-        if(submissionExists) {
+        if(submissionExists >= maxAttempts) {
 
-            let submission = await Submissions.findOne({ where: {
-                assignmentId,
-                userId,
-            }, });
-
-            const existingSubmissionsCount = submission.attempts;
-
-            if (existingSubmissionsCount >= maxAttempts) {
-                logger.warn('Exceeded the maximum number of submission attempts.');
-                return res.status(400).send({ message: 'Exceeded the maximum number of submission attempts.' });
-            }
+            logger.warn('Exceeded the maximum number of submission attempts.');
+            return res.status(400).send({ message: 'Exceeded the maximum number of submission attempts.' });
             
-                    // let submission_info = {
-                    //     submission_url: req.body.submission_url
-                    // };
 
-                    //const submission_url = req.body.submission_url;        
+            // let submission = await Submissions.findOne({ where: {
+            //     assignmentId,
+            //     userId,
+            // }, });
 
+            // const existingSubmissionsCount = submission.attempts;
 
-                    const updatedFields = {};
-                    if (submission_url !== undefined) updatedFields.submission_url = submission_url;
+            // if (existingSubmissionsCount >= maxAttempts) {
+            //     logger.warn('Exceeded the maximum number of submission attempts.');
+            //     return res.status(400).send({ message: 'Exceeded the maximum number of submission attempts.' });
+            // }
             
-                    updatedFields.submission_updated = db.sequelize.literal('CURRENT_TIMESTAMP');
-                    updatedFields.attempts = submission.attempts + 1;
-            
-                    let result = await Submissions.update(updatedFields, { where: {
-                        assignmentId,
-                        userId,
-                    } });
-            
-                    if (result[0] === 0) {
-                        logger.info(`Submission not found or not updated`);
-                        return res.status(404).send({message: 'Submission not found'});
-                    }
+            //         // let submission_info = {
+            //         //     submission_url: req.body.submission_url
+            //         // };
 
-                    let submissionNew = await Submissions.findOne({ where: {
-                        assignmentId,
-                        userId,
-                    }, });
+            //         //const submission_url = req.body.submission_url;        
 
-                    const snsParams = {
-                        TopicArn: snsTopicArn,
-                        Message: JSON.stringify({
-                            submission_url: submission.submission_url,
-                            user_email: user.email,
-                            assignment_id: assignment.id,
-                            submission_id: submission.id,
-                            user_id: user.id,
-                            assignment_name: assignment.name,
-                            attempts: submission.attempts,
-                            deadline: assignment.deadline,
-                        }),
-                    };
+
+            //         const updatedFields = {};
+            //         if (submission_url !== undefined) updatedFields.submission_url = submission_url;
             
-                    sns.publish(snsParams, (err, data) => {
-                        if (err) {
-                            console.error('Error publishing to SNS:', err);
-                        } else {
-                            console.log('Successfully published to SNS:', data);
-                        }
-                    });
+            //         updatedFields.submission_updated = db.sequelize.literal('CURRENT_TIMESTAMP');
+            //         updatedFields.attempts = submission.attempts + 1;
+            
+            //         let result = await Submissions.update(updatedFields, { where: {
+            //             assignmentId,
+            //             userId,
+            //         } });
+            
+            //         if (result[0] === 0) {
+            //             logger.info(`Submission not found or not updated`);
+            //             return res.status(404).send({message: 'Submission not found'});
+            //         }
+
+            //         let submissionNew = await Submissions.findOne({ where: {
+            //             assignmentId,
+            //             userId,
+            //         }, });
+
+            //         const snsParams = {
+            //             TopicArn: snsTopicArn,
+            //             Message: JSON.stringify({
+            //                 submission_url: submissionNew.submission_url,
+            //                 user_email: user.email,
+            //                 assignment_id: assignment.id,
+            //                 submission_id: submissionNew.id,
+            //                 user_id: user.id,
+            //                 assignment_name: assignment.name,
+            //                 attempts: submissionNew.attempts,
+            //                 deadline: assignment.deadline,
+            //             }),
+            //         };
+            
+            //         sns.publish(snsParams, (err, data) => {
+            //             if (err) {
+            //                 console.error('Error publishing to SNS:', err);
+            //             } else {
+            //                 console.log('Successfully published to SNS:', data);
+            //             }
+            //         });
 
             
-                    logger.info(`Submission updated successfully`);
-                    res.status(201).send(submissionNew );        
+            //         logger.info(`Submission updated successfully`);
+            //         res.status(201).send(submissionNew );        
             
                     // const submission = await Submissions.create(submission_info);
                     // logger.info(`Submission created successfully: ${submission.id}`);
@@ -148,7 +166,6 @@ const addSubmission = async (req, res) => {
 
             let submissionInfo = {
                 submission_url: submission_url,
-                attempts: 1,
                 userId: userId,
                 assignmentId: assignmentId
             };
@@ -164,7 +181,6 @@ const addSubmission = async (req, res) => {
                     submission_id: submission.id,
                     user_id: user.id,
                     assignment_name: assignment.name,
-                    attempts: submission.attempts,
                     deadline: assignment.deadline,
                 }),
             };
