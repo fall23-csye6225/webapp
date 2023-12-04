@@ -115,7 +115,8 @@ jobs:
       
     - name: Update Launch Template with new AMI ID
       run: |
-        launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names 'myLaunchTemplate-*' --region *** --query 'LaunchTemplates[0].LaunchTemplateId' --versions -1 --output json)
+        launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names 'myLaunchTemplate-*' --region {{ secrets.AWS_REGION_AMI } --query 'LaunchTemplates | sort_by(@, &VersionNumber) | [-1].LaunchTemplateId' --output text)
+
 
 
         if [ -z "$launch_template_id" ]; then
