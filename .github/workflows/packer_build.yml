@@ -104,7 +104,7 @@ jobs:
       id: get_ami_id
       run: |
         ami_id=$(aws ec2 describe-images --owners 078187768987 --filters "Name=name,Values=csye6225_f23_*" --query 'Images | sort_by(@, &CreationDate) | [-1].[ImageId]' --output text)
-        echo "AMI_ID=$ami_id" > ami_id.txt
+        echo $ami_id > ami_id.txt
         echo "AMI_ID: $ami_id"
 
     - name: Create Launch Template
