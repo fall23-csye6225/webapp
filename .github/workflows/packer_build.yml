@@ -91,11 +91,10 @@ jobs:
 
     - name: Build AMI with Packer and Get AMI ID from Output
       run: |
-        packer build -var-file=packer/packer_config.hcl packer/ami.us-east-1.pkr.hcl
         packer build -on-error=cleanup -color=false -var-file=packer/packer-config.hcl packer/ami.us-east-1.pkr.hcl | tee packer_output.log
-          ami_id=$(awk '/--> amazon-ebs.my-ami: AMIs were created:/{getline; print $NF}' packer_output.log)
-          echo "AMI_ID is: $ami_id"
-          echo $ami_id > ami_id.txt
+        ami_id=$(awk '/--> amazon-ebs.my-ami: AMIs were created:/{getline; print $NF}' packer_output.log)
+        echo "AMI_ID is: $ami_id"
+        echo $ami_id > ami_id.txt
 
     - name: Set up AWS CLI for demo
       uses: aws-actions/configure-aws-credentials@v1
