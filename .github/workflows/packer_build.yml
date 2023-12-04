@@ -109,7 +109,11 @@ jobs:
 
     - name: Create Launch Template
       run: |
-        aws ec2 create-launch-template-version --launch-template-name "myCloudLaunchTemplate" --source-version 1 --launch-template-data "{\"ImageId\":\"$ami_id\"}"
+        echo "AMI_ID: $ami_id"
+        launch_template_data="{\"ImageId\":\"$ami_id\"}"
+        echo "Launch Template Data: $launch_template_data"
+        aws ec2 create-launch-template-version --launch-template-name "myCloudLaunchTemplate" --source-version 1 --launch-template-data "$launch_template_data"
+
 
     - name: Refresh autoscaling group
       run: |
