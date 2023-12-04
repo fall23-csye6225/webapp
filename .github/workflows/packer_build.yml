@@ -105,6 +105,7 @@ jobs:
       run: |
         ami_id=$(aws ec2 describe-images --filters "Name=tag:Name,Values=csye6225_f23_$(date -u +\%Y_\%m_\%d_\%H_\%M)" --query 'Images[0].ImageId' --output text)
         echo "AMI_ID=$ami_id" > ami_id.txt
+        echo "AMI_ID: $ami_id"
 
     - name: Fetch latest Auto Scaling Group name
       id: fetch_asg_name
@@ -114,7 +115,8 @@ jobs:
       
     - name: Update Launch Template with new AMI ID
       run: |
-        launch_template_id=$(aws ec2 describe-launch-templates --launch-template-name myLaunchTemplate --region ${{ secrets.AWS_REGION_AMI }} --query 'LaunchTemplates[0].LaunchTemplateId' --output json)
+        launch_template_id=$(aws ec2 describe-launch-templates --launch-template-names 'myLaunchTemplate-*' --region *** --query 'LaunchTemplates[0].LaunchTemplateId' --versions -1 --output json)
+
 
         if [ -z "$launch_template_id" ]; then
           echo "Error: Launch template ID not found or empty. Exiting."
