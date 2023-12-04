@@ -103,7 +103,7 @@ jobs:
     - name: Get AMI ID
       id: get_ami_id
       run: |
-        ami_id=$(aws ec2 describe-images --filters "Name=tag:Name,Values=csye6225_f23_*" --query 'Images[0].ImageId' --output text)
+        ami_id=$(aws ec2 describe-images --owners 078187768987 --filters "Name=Name,Values=csye6225_f23_*" --query 'Images | sort_by(@, &CreationDate) | [-1].[ImageId]' --output text)
         echo "AMI_ID=$ami_id" > ami_id.txt
         echo "AMI_ID: $ami_id"
 
