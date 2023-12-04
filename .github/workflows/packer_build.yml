@@ -1,10 +1,6 @@
 name: Build and Deploy
 
-on: 
-  push:
-    branches:
-      - main
-
+on: [push]
 env:
   DB_HOST: "localhost"
   DB_USER: "root"
@@ -96,3 +92,64 @@ jobs:
     - name: Build AMI with Packer
       run: |
         packer build -var-file=packer/packer_config.hcl packer/ami.us-east-1.pkr.hcl
+
+    - name: Set up AWS CLI for dev
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY_ID_DEMO }}
+        aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY_DEMO }}
+        aws-region: ${{ secrets.AWS_REGION_AMI }}
+
+    - name: Get AMI ID
+      id: get_ami_id
+      run: |
+        ami_id=$(aws ec2 describe-images --filters "Name=tag:Name,Values=csye6225_f23_$(date -u +\%Y_\%m_\%d_\%H_\%M)" --query 'Images[0].ImageId' --output text)
+        echo "AMI_ID=$ami_id" > ami_id.txt
+
+    - name: Fetch latest Auto Scaling Group name
+      id: fetch_asg_name
+      run: |
+        asg_name=$(aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[0].AutoScalingGroupName' --output text)
+        echo "ASG_NAME=$asg_name" > asg_name.txt
+      
+    - name: Update Launch Template with new AMI ID
+      run: |
+        launch_template_id=$(aws ec2 describe-launch-templates --launch-template-name myLaunchTemplate --region ${{ secrets.AWS_REGION_AMI }} --query 'LaunchTemplates[0].LaunchTemplateId' --output json)
+
+        if [ -z "$launch_template_id" ]; then
+          echo "Error: Launch template ID not found or empty. Exiting."
+          exit 1
+        fi
+
+        ami_id=$(cat ami_id.txt)
+
+        echo "Launch Template ID: $launch_template_id"
+
+        launch_template_id=$(echo "$launch_template_id" | tr -d '"')
+
+        echo "Launch Template ID without quotes: $launch_template_id"
+
+        launch_template_data=$(aws ec2 describe-launch-templates --launch-template-ids "$launch_template_id" --query 'LaunchTemplates[0].LaunchTemplateData' --output json )
+
+        echo "Fetched launch template data"
+
+        modified_launch_template_data=$(echo $launch_template_data | jq --arg ami_id $ami_id '.ImageId = $ami_id')
+
+        echo "Modified the launch template data and going to update the launch template version"
+
+        aws ec2 create-launch-template-version \
+          --launch-template-id $launch_template_id \
+          --source-version $ami_id \
+          --launch-template-data "$modified_launch_template_data"
+
+
+    - name: Update Auto Scaling Group with new Launch Template
+      run: |
+        asg_name=$(cat asg_name.txt)
+        launch_template_id=$(cat launch_template_id.txt)
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg_name --launch-template LaunchTemplateId=$launch_template_id,Version=$launch_template_version
+
+    - name: Trigger instance refresh
+      run: |
+        asg_name=$(cat asg_name.txt)
+        aws autoscaling start-instance-refresh --auto-scaling-group-name $asg_name --strategy Rolling    
