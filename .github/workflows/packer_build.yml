@@ -93,7 +93,7 @@ jobs:
       run: |
         packer build -var-file=packer/packer_config.hcl packer/ami.us-east-1.pkr.hcl
 
-    - name: Set up AWS CLI for dev
+    - name: Set up AWS CLI for demo
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.ACCESS_KEY_ID_DEMO }}
@@ -103,7 +103,7 @@ jobs:
     - name: Get AMI ID
       id: get_ami_id
       run: |
-        ami_id=$(aws ec2 describe-images --owners 078187768987 --filters "Name=Name,Values=csye6225_f23_*" --query 'Images | sort_by(@, &CreationDate) | [-1].[ImageId]' --output text)
+        ami_id=$(aws ec2 describe-images --owners 078187768987 --filters "Name=name,Values=csye6225_f23_*" --query 'Images | sort_by(@, &CreationDate) | [-1].[ImageId]' --output text)
         echo "AMI_ID=$ami_id" > ami_id.txt
         echo "AMI_ID: $ami_id"
 
