@@ -113,9 +113,9 @@ jobs:
         echo "AMI_ID: $ami_id"
         launch_template_data="{\"ImageId\":\"$ami_id\"}"
         echo "Launch Template Data: $launch_template_data"
-        aws ec2 create-launch-template-version --launch-template-name "myCloudLaunchTemplate" --source-version 1 --launch-template-data "$launch_template_data"
+        aws ec2 create-launch-template-version --launch-template-name ${{ secrets.LAUNCH_TEMPLATE_NAME }} --source-version 1 --launch-template-data "$launch_template_data"
 
 
     - name: Refresh autoscaling group
       run: |
-        aws autoscaling start-instance-refresh --auto-scaling-group-name "myAutoScalingGroup-1795bbd"
+        aws autoscaling start-instance-refresh --auto-scaling-group-name ${{ secrets.AUTOSCALING_GROUP_NAME }}
