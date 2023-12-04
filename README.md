@@ -1,6 +1,6 @@
 # webapp
 
-## Assignment_8
+## Assignment_09
 
 Command to copy the zip file to server
 
@@ -30,23 +30,44 @@ $ show databases;
 packer init
 packer fmt .
 packer validate .
+
+#Command to import certificate
+aws acm import-certificate --certificate fileb:///cloud_cred/ssl_cred/demo_shinycrafts_me.crt \
+      --certificate-chain fileb:///cloud_cred/ssl_cred/demo_shinycrafts_me.p7b \
+      --private-key fileb:///cloud_cred/ssl_cred/private.key
+
 ```
 
-## Web Application Deployment
+  
+## Web Application Updates
 
-### Load Balancer Security Group
-- Create a security group for the load balancer, allowing TCP traffic on ports 80 and 443 globally.
+### API Specification
 
-### Update App Security Group
-- Modify EC2 security group to permit TCP traffic on ports 22 and app port, and restrict internet access.
+- Implement Additional API functionalities for Submissions based on the provided SwaggerHub API specification.
 
-### Auto Scaling Setup
-- Launch instances in an auto-scaling group (min: 1, max: 3) with CPU-based scaling policies.
+### Submission Handling
 
-### Application Load Balancer
-- Balance EC2 instances in the auto-scaling group and set up an Application Load Balancer for HTTP on port 80.
+- Handle POST requests for submission, allowing multiple attempts based on specified retry config.
+- Reject submissions if the user exceeds retries or if the assignment deadline has passed.
+  
+### SNS Topic Interaction
 
-### DNS Configuration
-- Update Route53 to alias the domain to the load balancer, ensuring access at http://(dev|demo).your-domain-name.tld/.
+- Post the URL to the SNS topic along with user information.
 
+## Assignment_10
 
+## Assignment Objectives
+
+- Secure web application endpoints with valid SSL certificates.
+- Implement CI/CD workflow for a pull request merged scenario.
+
+## Secure Application Endpoints
+
+### SSL Certificate Setup
+
+- **Dev Environment:**
+  - Utilize AWS Certificate Manager for SSL certificates.
+
+- **Demo Environment:**
+  - Request an SSL certificate from Namecheap.
+  - Import the certificate into AWS Certificate Manager from the CLI.
