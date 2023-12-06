@@ -32,7 +32,7 @@ app.use(express.urlencoded({extended: true}));
 // routes
 
 const router =  require('./routes/assignmentsRouter.js');
-app.use('/v1/assignments',checkAuthorization,router);
+app.use('/v2/assignments',checkAuthorization,router);
 
 // test
 
